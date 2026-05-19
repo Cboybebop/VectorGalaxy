@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Vector Galaxy</title>
+  <meta name="description" content="Vector Galaxy is a neon arcade shooter built for fast mobile and desktop play.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Vector Galaxy">
+  <meta property="og:description" content="Slide your fighter, break the formation, and survive the dive attacks.">
+  <meta property="og:image" content="/public/og-image.svg">
+  <meta property="og:url" content="https://vector-galaxy.vercel.app/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Vector Galaxy">
+  <meta name="twitter:description" content="A modern browser-based retro shooter.">
+  <meta name="twitter:image" content="/public/og-image.svg">
+  <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
   <link rel="preconnect" href="https://api.fontshare.com">
   <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
   <style>
@@ -367,6 +378,7 @@
           <div class="stat"><span>Score</span><strong id="score">0</strong></div>
           <div class="stat"><span>Lives</span><strong id="lives">3</strong></div>
           <div class="stat"><span>Wave</span><strong id="wave">1</strong></div>
+          <div class="stat"><span>Best</span><strong id="bestScore">0</strong></div>
         </div>
 
         <div class="hero-card">
@@ -428,6 +440,7 @@
     const scoreEl = document.getElementById('score');
     const livesEl = document.getElementById('lives');
     const waveEl = document.getElementById('wave');
+    const bestScoreEl = document.getElementById('bestScore');
     const modeLabel = document.getElementById('modeLabel');
     const bonusLabel = document.getElementById('bonusLabel');
     const overlay = document.getElementById('overlay');
@@ -459,6 +472,8 @@
     let lastShot = 0;
     let lastTime = 0;
     let pointerHeld = false;
+    let bestScore = Number(localStorage.getItem('vector-galaxy-best') || 0);
+    let highScores = [];
 
     function resetStars() {
       stars = Array.from({ length: 80 }, () => ({
@@ -532,6 +547,7 @@
       scoreEl.textContent = score;
       livesEl.textContent = lives;
       waveEl.textContent = wave;
+      bestScoreEl.textContent = bestScore;
       modeLabel.textContent = gameOver ? 'Downed' : autoFire ? 'Autofire on' : 'Precision';
       bonusLabel.textContent = combo > 1 ? `Combo x${combo}` : 'Chain shots raise your bonus';
     }
@@ -679,6 +695,43 @@
         overlay.classList.add('show');
         overlayTitle.textContent = 'Fleet lost';
         overlayText.textContent = `You reached wave ${wave} with ${score} points.`;
+        submitScore();
+      }
+    }
+
+
+
+    async function loadLeaderboard() {
+      try {
+        const response = await fetch('/api/highscores');
+        if (!response.ok) throw new Error('Leaderboard unavailable');
+        const data = await response.json();
+        highScores = Array.isArray(data.scores) ? data.scores : [];
+        if (highScores[0] && highScores[0].score > bestScore) {
+          bestScore = highScores[0].score;
+          localStorage.setItem('vector-galaxy-best', String(bestScore));
+          syncHud();
+        }
+      } catch {
+        // Falls back to local best score when KV isn't configured.
+      }
+    }
+
+    async function submitScore() {
+      bestScore = Math.max(bestScore, score);
+      localStorage.setItem('vector-galaxy-best', String(bestScore));
+      syncHud();
+      try {
+        const response = await fetch('/api/highscores', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ name: 'Pilot', score, wave })
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        highScores = Array.isArray(data.scores) ? data.scores : [];
+      } catch {
+        // Offline or API unavailable.
       }
     }
 
@@ -870,6 +923,7 @@
       });
     })();
 
+    loadLeaderboard();
     resetGame();
     requestAnimationFrame(frame);
   </script>
