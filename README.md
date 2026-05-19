@@ -4,7 +4,7 @@ VectorGalaxy is a lightweight browser arcade shooter now optimized for Vercel de
 
 ## Vercel-optimized setup
 
-- Static app served from `vector-galaxy.html` via a root rewrite in `vercel.json`.
+- Static app served from `vector-galaxy.html` via a clean-URL root rewrite to `/vector-galaxy` in `vercel.json`.
 - Serverless leaderboard API at `api/highscores.js`.
 - Optional Vercel KV-backed global high scores.
 - Open Graph and Twitter tags included for social previews.

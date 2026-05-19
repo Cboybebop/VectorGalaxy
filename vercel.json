@@ -19,6 +19,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/vector-galaxy.html" }
+    { "source": "/", "destination": "/vector-galaxy" }
   ]
 }
