@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en-GB" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vector Galaxy</title>
+  <link rel="preconnect" href="https://api.fontshare.com">
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=clash-display@500,600,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-5: 1.25rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-10: 2.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+      --radius-full: 9999px;
+      --font-display: 'Clash Display', 'Arial Black', sans-serif;
+      --font-body: 'General Sans', 'Arial', sans-serif;
+      --bg: #f4f4f0;
+      --surface: rgba(255,255,255,0.82);
+      --surface-2: rgba(245,245,240,0.92);
+      --border: rgba(30, 30, 30, 0.12);
+      --text: #111111;
+      --muted: #5a5a5a;
+      --primary: #0da6ff;
+      --secondary: #7c5cff;
+      --accent: #39ff9a;
+      --danger: #ff5f7d;
+      --shadow: 0 18px 48px rgba(20, 20, 20, 0.12);
+    }
+    [data-theme="dark"] {
+      --bg: #080913;
+      --surface: rgba(13, 17, 30, 0.88);
+      --surface-2: rgba(20, 27, 46, 0.96);
+      --border: rgba(255,255,255,0.1);
+      --text: #eff5ff;
+      --muted: #92a1bb;
+      --primary: #66d9ff;
+      --secondary: #a682ff;
+      --accent: #62ffb3;
+      --danger: #ff7f9d;
+      --shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+    * , *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(102, 217, 255, 0.18), transparent 28%),
+        radial-gradient(circle at 80% 15%, rgba(166, 130, 255, 0.16), transparent 26%),
+        radial-gradient(circle at 50% 80%, rgba(98, 255, 179, 0.09), transparent 24%),
+        var(--bg);
+      overflow: hidden;
+    }
+    button {
+      font: inherit;
+      color: inherit;
+      border: none;
+      cursor: pointer;
+    }
+    .app {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom));
+    }
+    .shell {
+      width: min(100%, 31rem);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .brand {
+      display: flex;
+      gap: var(--space-3);
+      align-items: center;
+    }
+    .brand-mark {
+      width: 2.8rem;
+      height: 2.8rem;
+      border-radius: 0.9rem;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(102, 217, 255, 0.2), rgba(98, 255, 179, 0.22));
+      color: var(--primary);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .brand p {
+      margin: 0;
+      font-size: var(--text-xs);
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      line-height: 1;
+    }
+    .toggle {
+      width: 2.75rem;
+      height: 2.75rem;
+      border-radius: var(--radius-full);
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .panel {
+      padding: var(--space-4);
+      display: grid;
+      gap: var(--space-4);
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+    .stat {
+      padding: var(--space-3);
+      border-radius: var(--radius-lg);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .stat span {
+      display: block;
+      font-size: var(--text-xs);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: var(--space-1);
+    }
+    .stat strong {
+      font-size: var(--text-lg);
+      font-variant-numeric: tabular-nums lining-nums;
+    }
+    .hero-card {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(102,217,255,0.12), rgba(12,18,34,0.3));
+      border: 1px solid var(--border);
+      display: grid;
+      gap: var(--space-3);
+    }
+    .hero-card h2 {
+      margin: 0;
+      font-size: var(--text-lg);
+    }
+    .hero-card p {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--muted);
+      max-width: 32ch;
+    }
+    .mini-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .tag {
+      border-radius: var(--radius-full);
+      padding: 0.45rem 0.8rem;
+      background: rgba(98,255,179,0.12);
+      border: 1px solid rgba(98,255,179,0.22);
+      font-size: var(--text-xs);
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .stage {
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+    .game-wrap {
+      position: relative;
+      border-radius: calc(var(--radius-xl) - 0.2rem);
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(10, 15, 28, 0.96), rgba(3, 7, 14, 1));
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    canvas {
+      width: 100%;
+      aspect-ratio: 10 / 15;
+      display: block;
+      touch-action: none;
+      background: transparent;
+    }
+    .hud-banner {
+      position: absolute;
+      inset: auto 0 0 0;
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-2);
+      padding: var(--space-3);
+      pointer-events: none;
+      font-size: var(--text-xs);
+      color: var(--muted);
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.42));
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(5, 7, 15, 0.6);
+      padding: var(--space-4);
+    }
+    .overlay.show { display: grid; }
+    .dialog {
+      width: min(100%, 22rem);
+      padding: var(--space-5);
+      border-radius: var(--radius-xl);
+      background: rgba(12, 18, 34, 0.94);
+      border: 1px solid rgba(255,255,255,0.12);
+      text-align: center;
+      box-shadow: var(--shadow);
+      display: grid;
+      gap: var(--space-3);
+    }
+    .dialog h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+    }
+    .dialog p {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--muted);
+    }
+    .controls {
+      display: grid;
+      gap: var(--space-3);
+    }
+    .button-row {
+      display: flex;
+      gap: var(--space-3);
+    }
+    .btn {
+      min-height: 3rem;
+      border-radius: var(--radius-full);
+      padding: 0 var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-2);
+      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary {
+      flex: 1;
+      background: linear-gradient(135deg, rgba(102,217,255,0.2), rgba(98,255,179,0.18));
+      color: var(--text);
+      border: 1px solid rgba(102,217,255,0.25);
+    }
+    .btn-secondary {
+      flex: 1;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .mobile-controls {
+      display: grid;
+      gap: var(--space-3);
+    }
+    .slider-shell {
+      background: var(--surface-2);
+      border-radius: var(--radius-full);
+      padding: var(--space-2);
+      border: 1px solid var(--border);
+    }
+    .slider-track {
+      position: relative;
+      height: 3.35rem;
+      border-radius: var(--radius-full);
+      background: rgba(255,255,255,0.04);
+    }
+    .ship-knob {
+      position: absolute;
+      top: 50%;
+      width: 4rem;
+      height: 2.35rem;
+      margin-top: -1.175rem;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, rgba(102,217,255,0.25), rgba(166,130,255,0.26));
+      border: 1px solid rgba(255,255,255,0.14);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+      display: grid;
+      place-items: center;
+      touch-action: none;
+    }
+    .fire-btn {
+      min-height: 3.4rem;
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: 700;
+      background: linear-gradient(135deg, rgba(255,127,157,0.26), rgba(255,95,125,0.2));
+      color: var(--text);
+      border: 1px solid rgba(255,127,157,0.3);
+    }
+    .caption {
+      margin: 0;
+      text-align: center;
+      font-size: var(--text-xs);
+      color: var(--muted);
+    }
+    @media (max-width: 23rem) {
+      .stats { grid-template-columns: 1fr; }
+      .button-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="shell" aria-label="Vector Galaxy arcade shooter">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4L16 15H8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+              <path d="M5 18H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M8 15L5 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M16 15L19 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <p>Vector dive shooter</p>
+            <h1>Vector Galaxy</h1>
+          </div>
+        </div>
+        <button class="toggle" type="button" data-theme-toggle aria-label="Switch to light mode">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="stats">
+          <div class="stat"><span>Score</span><strong id="score">0</strong></div>
+          <div class="stat"><span>Lives</span><strong id="lives">3</strong></div>
+          <div class="stat"><span>Wave</span><strong id="wave">1</strong></div>
+        </div>
+
+        <div class="hero-card">
+          <div class="mini-row">
+            <div>
+              <h2>Classic pressure, modern glow</h2>
+              <p>Slide your fighter, break the formation, and watch for dive attacks.</p>
+            </div>
+            <div>
+              <div class="tag" id="modeLabel">Ready</div>
+              <div class="stage" id="bonusLabel">Chain shots raise your bonus</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="game-wrap">
+          <canvas id="gameCanvas" width="480" height="720" aria-label="Arcade game play area"></canvas>
+          <div class="hud-banner">
+            <span>Drag the slider to move</span>
+            <span>Tap fire for rapid shots</span>
+          </div>
+          <div class="overlay" id="overlay">
+            <div class="dialog">
+              <p id="overlayTag">Run ended</p>
+              <h3 id="overlayTitle">Fleet lost</h3>
+              <p id="overlayText">Your score is ready for another attempt.</p>
+              <button class="btn btn-primary" id="overlayRestart" type="button">Launch again</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <div class="button-row">
+            <button class="btn btn-primary" id="restartButton" type="button">Restart</button>
+            <button class="btn btn-secondary" id="autofireButton" type="button">Autofire: On</button>
+          </div>
+          <div class="mobile-controls">
+            <div class="slider-shell">
+              <div class="slider-track" id="sliderTrack" aria-label="Ship movement slider">
+                <div class="ship-knob" id="shipKnob" aria-hidden="true">
+                  <svg width="26" height="16" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13 2L17 11H9L13 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M7 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <button class="fire-btn" id="fireButton" type="button">Fire pulse</button>
+            <p class="caption">Desktop controls: left and right arrows, A and D, plus space to fire.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreEl = document.getElementById('score');
+    const livesEl = document.getElementById('lives');
+    const waveEl = document.getElementById('wave');
+    const modeLabel = document.getElementById('modeLabel');
+    const bonusLabel = document.getElementById('bonusLabel');
+    const overlay = document.getElementById('overlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const overlayText = document.getElementById('overlayText');
+    const restartButton = document.getElementById('restartButton');
+    const overlayRestart = document.getElementById('overlayRestart');
+    const autofireButton = document.getElementById('autofireButton');
+    const fireButton = document.getElementById('fireButton');
+    const sliderTrack = document.getElementById('sliderTrack');
+    const shipKnob = document.getElementById('shipKnob');
+
+    let score = 0;
+    let lives = 3;
+    let wave = 1;
+    let combo = 0;
+    let autoFire = true;
+    let gameOver = false;
+    let keys = new Set();
+    let stars = [];
+    let bullets = [];
+    let enemyBullets = [];
+    let enemies = [];
+    let particles = [];
+    let player = null;
+    let formationOffset = 0;
+    let formationDirection = 1;
+    let diveClock = 0;
+    let lastShot = 0;
+    let lastTime = 0;
+    let pointerHeld = false;
+
+    function resetStars() {
+      stars = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        speed: 20 + Math.random() * 70,
+        size: Math.random() * 1.8 + 0.4,
+        alpha: Math.random() * 0.8 + 0.1
+      }));
+    }
+
+    function createPlayer() {
+      player = {
+        x: canvas.width / 2,
+        y: canvas.height - 64,
+        width: 30,
+        height: 24,
+        speed: 310,
+        flash: 0
+      };
+    }
+
+    function createFormation() {
+      enemies = [];
+      const cols = 7;
+      const rows = 4;
+      const startX = 72;
+      const startY = 92;
+      const gapX = 48;
+      const gapY = 42;
+      for (let row = 0; row < rows; row += 1) {
+        for (let col = 0; col < cols; col += 1) {
+          enemies.push({
+            baseX: startX + col * gapX,
+            baseY: startY + row * gapY,
+            x: startX + col * gapX,
+            y: startY + row * gapY,
+            row,
+            col,
+            alive: true,
+            diving: false,
+            vx: 0,
+            vy: 0,
+            angle: 0,
+            value: (4 - row) * 30
+          });
+        }
+      }
+      formationOffset = 0;
+      formationDirection = 1;
+      diveClock = 1.6;
+    }
+
+    function resetGame() {
+      score = 0;
+      lives = 3;
+      wave = 1;
+      combo = 0;
+      bullets = [];
+      enemyBullets = [];
+      particles = [];
+      gameOver = false;
+      overlay.classList.remove('show');
+      createPlayer();
+      createFormation();
+      resetStars();
+      syncHud();
+    }
+
+    function syncHud() {
+      scoreEl.textContent = score;
+      livesEl.textContent = lives;
+      waveEl.textContent = wave;
+      modeLabel.textContent = gameOver ? 'Downed' : autoFire ? 'Autofire on' : 'Precision';
+      bonusLabel.textContent = combo > 1 ? `Combo x${combo}` : 'Chain shots raise your bonus';
+    }
+
+    function fireBullet() {
+      const now = performance.now();
+      if (now - lastShot < 180 || gameOver) return;
+      lastShot = now;
+      bullets.push({ x: player.x, y: player.y - 18, vy: -520 });
+      particles.push({ x: player.x, y: player.y - 12, life: 0.18, color: '#66d9ff', radius: 5 });
+    }
+
+    function enemyFire(enemy) {
+      enemyBullets.push({ x: enemy.x, y: enemy.y + 12, vy: 210 + wave * 14 });
+    }
+
+    function updatePlayer(dt) {
+      if (keys.has('ArrowLeft') || keys.has('KeyA')) player.x -= player.speed * dt;
+      if (keys.has('ArrowRight') || keys.has('KeyD')) player.x += player.speed * dt;
+      player.x = Math.max(24, Math.min(canvas.width - 24, player.x));
+      if ((keys.has('Space') || pointerHeld) && autoFire) fireBullet();
+      player.flash = Math.max(0, player.flash - dt * 2.2);
+      updateKnobFromPlayer();
+    }
+
+    function updateFormation(dt) {
+      formationOffset += formationDirection * dt * (28 + wave * 4);
+      if (Math.abs(formationOffset) > 44) formationDirection *= -1;
+      for (const enemy of enemies) {
+        if (!enemy.alive) continue;
+        if (!enemy.diving) {
+          enemy.x = enemy.baseX + formationOffset;
+          enemy.y = enemy.baseY + Math.sin((enemy.col + performance.now() * 0.0012) * 1.2) * 3;
+        } else {
+          enemy.x += enemy.vx * dt;
+          enemy.y += enemy.vy * dt;
+          enemy.angle += dt * 7;
+          if (enemy.y > canvas.height + 24) {
+            enemy.diving = false;
+            enemy.x = enemy.baseX + formationOffset;
+            enemy.y = enemy.baseY;
+            enemy.vx = 0;
+            enemy.vy = 0;
+            enemy.angle = 0;
+          }
+          if (Math.random() < 0.016 + wave * 0.002) enemyFire(enemy);
+        }
+      }
+      diveClock -= dt;
+      if (diveClock <= 0) {
+        sendDiver();
+        diveClock = Math.max(0.55, 1.8 - wave * 0.08);
+      }
+      if (Math.random() < 0.02 + wave * 0.003) {
+        const shooters = enemies.filter(e => e.alive && !e.diving);
+        if (shooters.length) enemyFire(shooters[Math.floor(Math.random() * shooters.length)]);
+      }
+    }
+
+    function sendDiver() {
+      const candidates = enemies.filter(enemy => enemy.alive && !enemy.diving);
+      if (!candidates.length) return;
+      const enemy = candidates[Math.floor(Math.random() * candidates.length)];
+      enemy.diving = true;
+      const dx = player.x - enemy.x;
+      enemy.vx = dx * 0.6;
+      enemy.vy = 170 + wave * 16;
+    }
+
+    function updateProjectiles(dt) {
+      bullets.forEach(bullet => bullet.y += bullet.vy * dt);
+      enemyBullets.forEach(bullet => bullet.y += bullet.vy * dt);
+      bullets = bullets.filter(b => b.y > -20);
+      enemyBullets = enemyBullets.filter(b => b.y < canvas.height + 20);
+    }
+
+    function updateParticles(dt) {
+      particles.forEach(p => {
+        p.life -= dt;
+        p.radius += dt * 18;
+      });
+      particles = particles.filter(p => p.life > 0);
+    }
+
+    function updateStars(dt) {
+      stars.forEach(star => {
+        star.y += star.speed * dt;
+        if (star.y > canvas.height) {
+          star.y = -4;
+          star.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    function collide() {
+      for (const bullet of bullets) {
+        for (const enemy of enemies) {
+          if (!enemy.alive) continue;
+          if (Math.abs(bullet.x - enemy.x) < 18 && Math.abs(bullet.y - enemy.y) < 18) {
+            bullet.y = -100;
+            enemy.alive = false;
+            combo += 1;
+            const bonus = combo > 1 ? combo * 10 : 0;
+            score += enemy.value + bonus;
+            particles.push({ x: enemy.x, y: enemy.y, life: 0.38, color: '#62ffb3', radius: 10 });
+            particles.push({ x: enemy.x, y: enemy.y, life: 0.32, color: '#66d9ff', radius: 6 });
+            syncHud();
+          }
+        }
+      }
+
+      for (const bullet of enemyBullets) {
+        if (Math.abs(bullet.x - player.x) < 16 && Math.abs(bullet.y - player.y) < 16) {
+          bullet.y = canvas.height + 50;
+          loseLife();
+          break;
+        }
+      }
+
+      for (const enemy of enemies) {
+        if (!enemy.alive) continue;
+        if (Math.abs(enemy.x - player.x) < 20 && Math.abs(enemy.y - player.y) < 20) {
+          enemy.alive = false;
+          loseLife();
+        }
+      }
+
+      if (enemies.every(enemy => !enemy.alive)) {
+        wave += 1;
+        combo += 2;
+        score += 120;
+        createFormation();
+        syncHud();
+      }
+    }
+
+    function loseLife() {
+      lives -= 1;
+      combo = 0;
+      player.flash = 1;
+      particles.push({ x: player.x, y: player.y, life: 0.55, color: '#ff7f9d', radius: 12 });
+      syncHud();
+      if (lives <= 0) {
+        gameOver = true;
+        overlay.classList.add('show');
+        overlayTitle.textContent = 'Fleet lost';
+        overlayText.textContent = `You reached wave ${wave} with ${score} points.`;
+      }
+    }
+
+    function drawShip(x, y, color, flash = 0) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.2;
+      ctx.shadowBlur = 12 + flash * 10;
+      ctx.shadowColor = color;
+      ctx.beginPath();
+      ctx.moveTo(0, -12);
+      ctx.lineTo(10, 8);
+      ctx.lineTo(4, 8);
+      ctx.lineTo(0, 2);
+      ctx.lineTo(-4, 8);
+      ctx.lineTo(-10, 8);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-8, 6);
+      ctx.lineTo(-14, 12);
+      ctx.moveTo(8, 6);
+      ctx.lineTo(14, 12);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawEnemy(enemy) {
+      ctx.save();
+      ctx.translate(enemy.x, enemy.y);
+      if (enemy.diving) ctx.rotate(Math.sin(enemy.angle) * 0.35);
+      const palette = ['#62ffb3', '#66d9ff', '#a682ff', '#ff7f9d'];
+      ctx.strokeStyle = palette[enemy.row % palette.length];
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = ctx.strokeStyle;
+      ctx.beginPath();
+      ctx.moveTo(-10, 8);
+      ctx.lineTo(-5, -6);
+      ctx.lineTo(0, -10);
+      ctx.lineTo(5, -6);
+      ctx.lineTo(10, 8);
+      ctx.moveTo(-10, 8);
+      ctx.lineTo(0, 4);
+      ctx.lineTo(10, 8);
+      ctx.moveTo(-4, 0);
+      ctx.lineTo(4, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      stars.forEach(star => {
+        ctx.fillStyle = `rgba(255,255,255,${star.alpha})`;
+        ctx.fillRect(star.x, star.y, star.size, star.size);
+      });
+
+      ctx.strokeStyle = 'rgba(102, 217, 255, 0.08)';
+      ctx.lineWidth = 1;
+      for (let y = 40; y < canvas.height; y += 56) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      bullets.forEach(bullet => {
+        ctx.strokeStyle = '#66d9ff';
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#66d9ff';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bullet.x, bullet.y + 8);
+        ctx.lineTo(bullet.x, bullet.y - 8);
+        ctx.stroke();
+      });
+
+      enemyBullets.forEach(bullet => {
+        ctx.strokeStyle = '#ff7f9d';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ff7f9d';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(bullet.x, bullet.y - 6);
+        ctx.lineTo(bullet.x, bullet.y + 6);
+        ctx.stroke();
+      });
+
+      enemies.forEach(enemy => { if (enemy.alive) drawEnemy(enemy); });
+      drawShip(player.x, player.y, player.flash > 0 ? '#ff7f9d' : '#66d9ff', player.flash);
+
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.fillStyle = p.color.replace(')', `, ${Math.max(0, p.life)})`);
+      });
+
+      particles.forEach(p => {
+        ctx.beginPath();
+        ctx.globalAlpha = Math.max(0, p.life * 2);
+        ctx.fillStyle = p.color;
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      });
+    }
+
+    function frame(time) {
+      if (!lastTime) lastTime = time;
+      const dt = Math.min(0.033, (time - lastTime) / 1000);
+      lastTime = time;
+      if (!gameOver) {
+        updateStars(dt);
+        updatePlayer(dt);
+        updateFormation(dt);
+        updateProjectiles(dt);
+        updateParticles(dt);
+        collide();
+      }
+      render();
+      requestAnimationFrame(frame);
+    }
+
+    function trackPointer(clientX) {
+      const rect = sliderTrack.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      player.x = 24 + ratio * (canvas.width - 48);
+      updateKnobFromPlayer();
+    }
+
+    function updateKnobFromPlayer() {
+      const rect = sliderTrack.getBoundingClientRect();
+      const width = rect.width || sliderTrack.offsetWidth;
+      const ratio = (player.x - 24) / (canvas.width - 48);
+      shipKnob.style.left = `calc(${(ratio * 100).toFixed(2)}% - 2rem)`;
+      shipKnob.style.left = `${Math.max(0, Math.min(width - 64, ratio * (width - 64)))}px`;
+    }
+
+    sliderTrack.addEventListener('pointerdown', (event) => {
+      trackPointer(event.clientX);
+      sliderTrack.setPointerCapture(event.pointerId);
+    });
+    sliderTrack.addEventListener('pointermove', (event) => {
+      if (event.pressure > 0 || event.buttons > 0) trackPointer(event.clientX);
+    });
+
+    fireButton.addEventListener('pointerdown', () => {
+      pointerHeld = true;
+      fireBullet();
+    });
+    fireButton.addEventListener('pointerup', () => { pointerHeld = false; });
+    fireButton.addEventListener('pointerleave', () => { pointerHeld = false; });
+
+    document.addEventListener('keydown', (event) => {
+      keys.add(event.code);
+      if (event.code === 'Space') {
+        event.preventDefault();
+        fireBullet();
+      }
+    });
+    document.addEventListener('keyup', event => keys.delete(event.code));
+
+    restartButton.addEventListener('click', resetGame);
+    overlayRestart.addEventListener('click', resetGame);
+    autofireButton.addEventListener('click', () => {
+      autoFire = !autoFire;
+      autofireButton.textContent = `Autofire: ${autoFire ? 'On' : 'Off'}`;
+      syncHud();
+    });
+
+    (function themeToggle() {
+      const btn = document.querySelector('[data-theme-toggle]');
+      const root = document.documentElement;
+      let mode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', mode);
+      const renderIcon = () => {
+        btn.setAttribute('aria-label', `Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`);
+        btn.innerHTML = mode === 'dark'
+          ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
+          : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+      };
+      renderIcon();
+      btn.addEventListener('click', () => {
+        mode = mode === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', mode);
+        renderIcon();
+      });
+    })();
+
+    resetGame();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>
