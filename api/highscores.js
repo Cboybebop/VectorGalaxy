@@ -18,8 +18,8 @@ function json(data, status = 200, origin = '*') {
 }
 
 function getKvConfig() {
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
+  const url = process.env.KV_REST_API_URL || process.env.vercil_KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.vercil_KV_REST_API_TOKEN;
 
   return { url, token };
 }
@@ -66,7 +66,7 @@ export default async function handler(req) {
     return json(
       {
         error:
-          'Vercel KV is not configured. Add KV_REST_API_URL and KV_REST_API_TOKEN.'
+          'Vercel KV is not configured. Add KV_REST_API_URL + KV_REST_API_TOKEN (or vercil_KV_REST_API_URL + vercil_KV_REST_API_TOKEN).'
       },
       503,
       origin

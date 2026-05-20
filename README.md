@@ -29,6 +29,15 @@ VectorGalaxy is a lightweight browser arcade shooter optimized for Vercel deploy
 
 After this, highscores are persisted globally through `/api/highscores`.
 
+### Using `vercil_`-prefixed env keys
+
+If you already created variables named:
+- `vercil_KV_REST_API_URL`
+- `vercil_KV_REST_API_TOKEN`
+
+this project now supports them directly as a fallback. You can keep those names, though the standard Vercel KV names are still recommended (`KV_REST_API_URL`, `KV_REST_API_TOKEN`).
+
+
 If KV is not configured, gameplay still works and keeps a local best score in the browser.
 
 ## Local run
