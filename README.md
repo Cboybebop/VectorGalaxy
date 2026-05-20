@@ -17,6 +17,8 @@ VectorGalaxy is a lightweight browser arcade shooter optimized for Vercel deploy
 2. (Optional but recommended) Add **Vercel KV** and configure:
    - `KV_REST_API_URL`
    - `KV_REST_API_TOKEN`
+   - or `KV_REST_API_TOKEN_READ_WRITE`
+   - or `KV_REST_API_TOKEN_READ_WRITE_TOKEN`
 3. Deploy.
 
 If KV is not configured, gameplay still works and keeps a local best score in the browser.
@@ -24,3 +26,6 @@ If KV is not configured, gameplay still works and keeps a local best score in th
 ## Local run
 
 Open `index.html` directly, or run any static file server and open the app.
+
+
+> Note: Vercel Blob and Vercel KV are different products. This high score API uses **Vercel KV REST** (`KV_REST_API_URL` + token).
