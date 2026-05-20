@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090d1e"/>
+      <stop offset="100%" stop-color="#120b2a"/>
+    </linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#66d9ff"/>
+      <stop offset="100%" stop-color="#62ffb3"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="200" cy="120" r="140" fill="#66d9ff" fill-opacity="0.12"/>
+  <circle cx="980" cy="160" r="120" fill="#a682ff" fill-opacity="0.14"/>
+  <text x="120" y="280" fill="#eff5ff" font-family="Arial, sans-serif" font-size="84" font-weight="700">Vector Galaxy</text>
+  <text x="120" y="350" fill="#92a1bb" font-family="Arial, sans-serif" font-size="36">Classic pressure, modern glow.</text>
+  <path d="M870 170L970 430H770L870 170Z" fill="none" stroke="url(#g)" stroke-width="16"/>
+  <path d="M720 500H1020" stroke="url(#g)" stroke-width="14" stroke-linecap="round"/>
+</svg>
