@@ -2,6 +2,14 @@
 
 VectorGalaxy is a lightweight browser arcade shooter optimized for Vercel deployment.
 
+## Gameplay
+
+- Four rotating formation layouts populated by scouts, gunners, tanks, and support ships.
+- A two-second combo window rewards aggressive target selection and perfect waves.
+- Choose one of three run-defining upgrades after every second cleared wave.
+- Multi-phase command ships appear every fifth wave.
+- End-of-run statistics track eliminations, highest combo, perfect waves, and defeated bosses.
+
 ## Vercel-optimized setup
 
 - Root entry point is `index.html` for reliable static hosting.
