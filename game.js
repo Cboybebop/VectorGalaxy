@@ -775,22 +775,24 @@ function updateStars(dt) {
   });
 }
 
-// CANVAS DRAWING ROUTINES (WITH VIRTUAL TO CANVAS RESOLUTION SCALING)
+// CANVAS DRAWING ROUTINES (FULL-WIDTH & RESPONSIVE SCALING)
 function drawShip(x, y, color) {
   ctx.save();
-  ctx.translate(offsetX + x * scaleFactor, offsetY + y * scaleFactor);
+  ctx.translate(x * scaleFactorX, y * scaleFactorY);
   ctx.strokeStyle = color;
-  ctx.lineWidth = 2.8 * scaleFactor;
-  ctx.shadowBlur = 16 * scaleFactor;
+  const sMin = Math.min(scaleFactorX, scaleFactorY);
+  ctx.lineWidth = 2.8 * sMin;
+  ctx.shadowBlur = 16 * sMin;
   ctx.shadowColor = color;
+  const sX = scaleFactorX, sY = scaleFactorY;
 
   ctx.beginPath();
-  ctx.moveTo(0, -18 * scaleFactor);
-  ctx.lineTo(14 * scaleFactor, 12 * scaleFactor);
-  ctx.lineTo(6 * scaleFactor, 12 * scaleFactor);
-  ctx.lineTo(0, 3 * scaleFactor);
-  ctx.lineTo(-6 * scaleFactor, 12 * scaleFactor);
-  ctx.lineTo(-14 * scaleFactor, 12 * scaleFactor);
+  ctx.moveTo(0, -18 * sY);
+  ctx.lineTo(14 * sX, 12 * sY);
+  ctx.lineTo(6 * sX, 12 * sY);
+  ctx.lineTo(0, 3 * sY);
+  ctx.lineTo(-6 * sX, 12 * sY);
+  ctx.lineTo(-14 * sX, 12 * sY);
   ctx.closePath();
   ctx.stroke();
   ctx.restore();
@@ -799,102 +801,95 @@ function drawShip(x, y, color) {
 function drawEnemy(e) {
   const d = ENEMY_TYPES[e.type];
   ctx.save();
-  ctx.translate(offsetX + e.x * scaleFactor, offsetY + e.y * scaleFactor);
+  ctx.translate(e.x * scaleFactorX, e.y * scaleFactorY);
   if (e.diving) ctx.rotate(Math.sin(e.angle) * 0.35);
 
   ctx.strokeStyle = d.color;
-  ctx.lineWidth = (e.type === 'tank' ? 3.5 : 2.5) * scaleFactor;
-  ctx.shadowBlur = 12 * scaleFactor;
+  const sMin = Math.min(scaleFactorX, scaleFactorY);
+  ctx.lineWidth = (e.type === 'tank' ? 3.5 : 2.5) * sMin;
+  ctx.shadowBlur = 12 * sMin;
   ctx.shadowColor = d.color;
+  const sX = scaleFactorX, sY = scaleFactorY;
 
   ctx.beginPath();
-  ctx.moveTo(-15 * scaleFactor, 12 * scaleFactor);
-  ctx.lineTo(-7 * scaleFactor, -8 * scaleFactor);
-  ctx.lineTo(0, -14 * scaleFactor);
-  ctx.lineTo(7 * scaleFactor, -8 * scaleFactor);
-  ctx.lineTo(15 * scaleFactor, 12 * scaleFactor);
-  ctx.lineTo(0, 6 * scaleFactor);
+  ctx.moveTo(-15 * sX, 12 * sY);
+  ctx.lineTo(-7 * sX, -8 * sY);
+  ctx.lineTo(0, -14 * sY);
+  ctx.lineTo(7 * sX, -8 * sY);
+  ctx.lineTo(15 * sX, 12 * sY);
+  ctx.lineTo(0, 6 * sY);
   ctx.closePath();
   ctx.stroke();
 
   if (e.hp < e.maxHp) {
     ctx.fillStyle = d.color;
-    ctx.fillRect(-12 * scaleFactor, 18 * scaleFactor, (24 * e.hp / e.maxHp) * scaleFactor, 3 * scaleFactor);
+    ctx.fillRect(-12 * sX, 18 * sY, (24 * e.hp / e.maxHp) * sX, 3 * sY);
   }
   ctx.restore();
 }
 
 function drawBoss() {
   ctx.save();
-  ctx.translate(offsetX + boss.x * scaleFactor, offsetY + boss.y * scaleFactor);
+  ctx.translate(boss.x * scaleFactorX, boss.y * scaleFactorY);
   ctx.strokeStyle = '#ffcf66';
   ctx.shadowColor = '#ffcf66';
-  ctx.shadowBlur = 24 * scaleFactor;
-  ctx.lineWidth = 3.5 * scaleFactor;
+  const sMin = Math.min(scaleFactorX, scaleFactorY);
+  ctx.shadowBlur = 24 * sMin;
+  ctx.lineWidth = 3.5 * sMin;
+  const sX = scaleFactorX, sY = scaleFactorY;
 
-  ctx.strokeRect(-65 * scaleFactor, -35 * scaleFactor, 130 * scaleFactor, 70 * scaleFactor);
+  ctx.strokeRect(-65 * sX, -35 * sY, 130 * sX, 70 * sY);
   ctx.beginPath();
-  ctx.moveTo(-90 * scaleFactor, 0);
-  ctx.lineTo(-50 * scaleFactor, -25 * scaleFactor);
-  ctx.moveTo(90 * scaleFactor, 0);
-  ctx.lineTo(50 * scaleFactor, -25 * scaleFactor);
+  ctx.moveTo(-90 * sX, 0);
+  ctx.lineTo(-50 * sX, -25 * sY);
+  ctx.moveTo(90 * sX, 0);
+  ctx.lineTo(50 * sX, -25 * sY);
   ctx.stroke();
 
   ctx.fillStyle = 'rgba(255,255,255,.15)';
-  ctx.fillRect(-90 * scaleFactor, 50 * scaleFactor, 180 * scaleFactor, 8 * scaleFactor);
+  ctx.fillRect(-90 * sX, 50 * sY, 180 * sX, 8 * sY);
   ctx.fillStyle = '#ffcf66';
-  ctx.fillRect(-90 * scaleFactor, 50 * scaleFactor, (180 * boss.hp / boss.maxHp) * scaleFactor, 8 * scaleFactor);
+  ctx.fillRect(-90 * sX, 50 * sY, (180 * boss.hp / boss.maxHp) * sX, 8 * sY);
   ctx.restore();
 }
 
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const sMin = Math.min(scaleFactorX, scaleFactorY);
 
-  // Draw Starfield (covers full canvas for dark space background)
+  // Draw Starfield (full canvas width and height)
   if (stars) stars.forEach(s => {
     ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-    ctx.fillRect(s.x * scaleFactor + offsetX * 0.2, s.y * scaleFactor + offsetY * 0.2, s.size * scaleFactor, s.size * scaleFactor);
+    ctx.fillRect(s.x * scaleFactorX, s.y * scaleFactorY, s.size * sMin, s.size * sMin);
   });
 
-  // Background Grid Lines inside virtual play area
+  // Background Grid Lines
   ctx.strokeStyle = 'rgba(102,217,255,.06)';
-  ctx.lineWidth = 1 * scaleFactor;
+  ctx.lineWidth = 1 * sMin;
   for (let y = 60; y < VIRTUAL_HEIGHT; y += 80) {
     ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY + y * scaleFactor);
-    ctx.lineTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY + y * scaleFactor);
-    ctx.stroke();
-  }
-
-  // Draw subtle play boundary side rails if aspect ratio leaves side margins
-  if (offsetX > 4) {
-    ctx.strokeStyle = 'rgba(102,217,255,.15)';
-    ctx.lineWidth = 1.5 * scaleFactor;
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
-    ctx.lineTo(offsetX, offsetY + VIRTUAL_HEIGHT * scaleFactor);
-    ctx.moveTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY);
-    ctx.lineTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY + VIRTUAL_HEIGHT * scaleFactor);
+    ctx.moveTo(0, y * scaleFactorY);
+    ctx.lineTo(canvas.width, y * scaleFactorY);
     ctx.stroke();
   }
 
   // Draw Player Bullets
   if (bullets) bullets.forEach(b => {
     ctx.strokeStyle = '#66d9ff';
-    ctx.lineWidth = 2.5 * scaleFactor;
+    ctx.lineWidth = 2.5 * sMin;
     ctx.beginPath();
-    ctx.moveTo(offsetX + b.x * scaleFactor, offsetY + (b.y + 12) * scaleFactor);
-    ctx.lineTo(offsetX + b.x * scaleFactor, offsetY + (b.y - 12) * scaleFactor);
+    ctx.moveTo(b.x * scaleFactorX, (b.y + 12) * scaleFactorY);
+    ctx.lineTo(b.x * scaleFactorX, (b.y - 12) * scaleFactorY);
     ctx.stroke();
   });
 
   // Draw Enemy Bullets
   if (enemyBullets) enemyBullets.forEach(b => {
     ctx.strokeStyle = '#ff7f9d';
-    ctx.lineWidth = 2.5 * scaleFactor;
+    ctx.lineWidth = 2.5 * sMin;
     ctx.beginPath();
-    ctx.moveTo(offsetX + b.x * scaleFactor, offsetY + (b.y - 10) * scaleFactor);
-    ctx.lineTo(offsetX + b.x * scaleFactor, offsetY + (b.y + 10) * scaleFactor);
+    ctx.moveTo(b.x * scaleFactorX, (b.y - 10) * scaleFactorY);
+    ctx.lineTo(b.x * scaleFactorX, (b.y + 10) * scaleFactorY);
     ctx.stroke();
   });
 
@@ -910,7 +905,7 @@ function render() {
     ctx.globalAlpha = Math.max(0, p.life * 2);
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(offsetX + p.x * scaleFactor, offsetY + p.y * scaleFactor, p.radius * scaleFactor, 0, Math.PI * 2);
+    ctx.arc(p.x * scaleFactorX, p.y * scaleFactorY, p.radius * sMin, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 1;
   });
@@ -947,7 +942,7 @@ function frame(time) {
 // EVENT LISTENERS & INPUT HANDLERS
 function handleCanvasPointer(e) {
   const rect = canvas.getBoundingClientRect();
-  const relX = (e.clientX - rect.left - offsetX) / (VIRTUAL_WIDTH * scaleFactor);
+  const relX = (e.clientX - rect.left) / rect.width;
   player.x = Math.max(30, Math.min(VIRTUAL_WIDTH - 30, relX * VIRTUAL_WIDTH));
 }
 
