@@ -85,9 +85,10 @@ const SHOP_ITEMS = [
 // STATE VARIABLES
 let currentDifficulty = 'normal';
 let gameState = 'TITLE'; // TITLE, PLAYING, SHOP, GAMEOVER, PAUSED
-let score, lives, cash, ante, round, combo, comboTime, autoFire, keys;
-let stars, bullets, enemyBullets, enemies, particles, player, boss;
-let formationOffset, formationDirection, diveClock, lastShot, lastTime, pointerHeld;
+let score = 0, lives = 3, cash = 0, ante = 1, round = 1, combo = 0, comboTime = 0, autoFire = true;
+let keys = new Set();
+let stars = [], bullets = [], enemyBullets = [], enemies = [], particles = [], player = null, boss = null;
+let formationOffset = 0, formationDirection = 1, diveClock = 1.5, lastShot = 0, lastTime = 0, pointerHeld = false;
 let bestScore = Number(localStorage.getItem(`vector-galaxy-best-${currentDifficulty}`) || 0);
 let activeBossModifier = null;
 let equippedPassives = [];
@@ -122,6 +123,7 @@ function resizeCanvas() {
   const container = $('gameWrap');
   if (!container) return;
   const rect = container.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   
   canvas.width = rect.width * dpr;
@@ -213,6 +215,7 @@ function startRun() {
   overlay.classList.remove('show');
   gameState = 'PLAYING';
   
+  resizeCanvas();
   createPlayer();
   setupBlind();
   resetStars();
@@ -834,7 +837,7 @@ function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   // Draw Starfield
-  stars.forEach(s => {
+  if (stars) stars.forEach(s => {
     ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
     ctx.fillRect(s.x * scaleFactor, s.y * scaleFactor, s.size * scaleFactor, s.size * scaleFactor);
   });
@@ -850,7 +853,7 @@ function render() {
   }
 
   // Draw Player Bullets
-  bullets.forEach(b => {
+  if (bullets) bullets.forEach(b => {
     ctx.strokeStyle = '#66d9ff';
     ctx.lineWidth = 2.5 * scaleFactor;
     ctx.beginPath();
@@ -860,7 +863,7 @@ function render() {
   });
 
   // Draw Enemy Bullets
-  enemyBullets.forEach(b => {
+  if (enemyBullets) enemyBullets.forEach(b => {
     ctx.strokeStyle = '#ff7f9d';
     ctx.lineWidth = 2.5 * scaleFactor;
     ctx.beginPath();
@@ -877,7 +880,7 @@ function render() {
   if (player) drawShip(player.x, player.y, player.flash ? '#ff7f9d' : '#66d9ff');
 
   // Draw Particles
-  particles.forEach(p => {
+  if (particles) particles.forEach(p => {
     ctx.globalAlpha = Math.max(0, p.life * 2);
     ctx.fillStyle = p.color;
     ctx.beginPath();
