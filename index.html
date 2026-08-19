@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Vector Galaxy</title>
-  <meta name="description" content="Vector Galaxy is a neon arcade shooter built for fast mobile and desktop play.">
+  <title>Vector Galaxy - Roguelike Arcade Shooter</title>
+  <meta name="description" content="Vector Galaxy is a neon roguelike arcade shooter with Balatro-inspired modifiers, boss blinds, and full multi-input controller support.">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Vector Galaxy">
-  <meta property="og:description" content="Slide your fighter, break the formation, and survive the dive attacks.">
+  <meta property="og:description" content="Slide your fighter, defeat boss blinds, collect passive modifiers, and survive dive attacks across 3 difficulty levels.">
   <meta property="og:image" content="/og-image.svg">
-    <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Vector Galaxy">
-  <meta name="twitter:description" content="A modern browser-based retro shooter.">
+  <meta name="twitter:description" content="A modern browser-based retro shooter with roguelike mechanics.">
   <meta name="twitter:image" content="/og-image.svg">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="preconnect" href="https://api.fontshare.com">
@@ -30,7 +30,6 @@
       --space-5: 1.25rem;
       --space-6: 1.5rem;
       --space-8: 2rem;
-      --space-10: 2.5rem;
       --radius-md: 0.75rem;
       --radius-lg: 1rem;
       --radius-xl: 1.5rem;
@@ -38,31 +37,33 @@
       --font-display: 'Clash Display', 'Arial Black', sans-serif;
       --font-body: 'General Sans', 'Arial', sans-serif;
       --bg: #f4f4f0;
-      --surface: rgba(255,255,255,0.82);
-      --surface-2: rgba(245,245,240,0.92);
+      --surface: rgba(255,255,255,0.85);
+      --surface-2: rgba(245,245,240,0.94);
       --border: rgba(30, 30, 30, 0.12);
       --text: #111111;
       --muted: #5a5a5a;
       --primary: #0da6ff;
       --secondary: #7c5cff;
       --accent: #39ff9a;
+      --gold: #f59e0b;
       --danger: #ff5f7d;
       --shadow: 0 18px 48px rgba(20, 20, 20, 0.12);
     }
     [data-theme="dark"] {
-      --bg: #080913;
-      --surface: rgba(13, 17, 30, 0.88);
+      --bg: #060810;
+      --surface: rgba(13, 17, 30, 0.9);
       --surface-2: rgba(20, 27, 46, 0.96);
-      --border: rgba(255,255,255,0.1);
+      --border: rgba(255,255,255,0.12);
       --text: #eff5ff;
       --muted: #92a1bb;
       --primary: #66d9ff;
       --secondary: #a682ff;
       --accent: #62ffb3;
+      --gold: #fbbf24;
       --danger: #ff7f9d;
-      --shadow: 0 24px 60px rgba(0,0,0,0.45);
+      --shadow: 0 24px 60px rgba(0,0,0,0.55);
     }
-    * , *::before, *::after { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100dvh;
@@ -70,11 +71,11 @@
       font-size: var(--text-base);
       color: var(--text);
       background:
-        radial-gradient(circle at 20% 20%, rgba(102, 217, 255, 0.18), transparent 28%),
-        radial-gradient(circle at 80% 15%, rgba(166, 130, 255, 0.16), transparent 26%),
-        radial-gradient(circle at 50% 80%, rgba(98, 255, 179, 0.09), transparent 24%),
+        radial-gradient(circle at 20% 20%, rgba(102, 217, 255, 0.15), transparent 30%),
+        radial-gradient(circle at 80% 15%, rgba(166, 130, 255, 0.14), transparent 28%),
+        radial-gradient(circle at 50% 80%, rgba(98, 255, 179, 0.08), transparent 25%),
         var(--bg);
-      overflow: hidden;
+      overflow-x: hidden;
     }
     button {
       font: inherit;
@@ -84,12 +85,17 @@
     }
     .app {
       min-height: 100dvh;
-      display: grid;
-      place-items: center;
-      padding: max(var(--space-4), env(safe-area-inset-top)) var(--space-4) max(var(--space-4), env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: max(var(--space-2), env(safe-area-inset-top)) var(--space-3) max(var(--space-2), env(safe-area-inset-bottom));
     }
     .shell {
-      width: min(100%, 31rem);
+      width: 100%;
+      max-width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius-xl);
@@ -102,8 +108,9 @@
       align-items: center;
       justify-content: space-between;
       gap: var(--space-4);
-      padding: var(--space-4);
+      padding: var(--space-3) var(--space-4);
       border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(0,0,0,0.15);
     }
     .brand {
       display: flex;
@@ -111,14 +118,14 @@
       align-items: center;
     }
     .brand-mark {
-      width: 2.8rem;
-      height: 2.8rem;
-      border-radius: 0.9rem;
+      width: 2.6rem;
+      height: 2.6rem;
+      border-radius: 0.8rem;
       display: grid;
       place-items: center;
-      background: linear-gradient(135deg, rgba(102, 217, 255, 0.2), rgba(98, 255, 179, 0.22));
+      background: linear-gradient(135deg, rgba(102, 217, 255, 0.25), rgba(98, 255, 179, 0.25));
       color: var(--primary);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
     }
     .brand p {
       margin: 0;
@@ -130,158 +137,359 @@
     .brand h1 {
       margin: 0;
       font-family: var(--font-display);
-      font-size: var(--text-xl);
+      font-size: var(--text-lg);
       line-height: 1;
     }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .badge-easy { color: var(--accent); border-color: rgba(98,255,179,0.3); background: rgba(98,255,179,0.1); }
+    .badge-normal { color: var(--primary); border-color: rgba(102,217,255,0.3); background: rgba(102,217,255,0.1); }
+    .badge-hard { color: var(--danger); border-color: rgba(255,127,157,0.3); background: rgba(255,127,157,0.1); }
     .toggle {
-      width: 2.75rem;
-      height: 2.75rem;
+      width: 2.5rem;
+      height: 2.5rem;
       border-radius: var(--radius-full);
       display: grid;
       place-items: center;
       background: var(--surface-2);
       border: 1px solid var(--border);
     }
-    .panel {
-      padding: var(--space-4);
-      display: grid;
-      gap: var(--space-4);
+    .main-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      width: 100%;
     }
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+    /* TITLE SCREEN */
+    .title-screen {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-6) var(--space-4);
+      text-align: center;
+      gap: var(--space-5);
+      background: radial-gradient(circle at 50% 30%, rgba(102, 217, 255, 0.12), transparent 60%);
+    }
+    .title-screen.hidden { display: none; }
+    .title-hero {
+      max-width: 36rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       gap: var(--space-3);
     }
-    .stat {
-      padding: var(--space-3);
+    .title-hero h2 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      margin: 0;
+      background: linear-gradient(135deg, var(--text) 30%, var(--primary) 70%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.05;
+    }
+    .title-hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: var(--text-base);
+      max-width: 32ch;
+    }
+    .difficulty-select {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--space-3);
+      width: min(100%, 34rem);
+    }
+    .diff-card {
+      padding: var(--space-4) var(--space-3);
       border-radius: var(--radius-lg);
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      text-align: center;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .diff-card:hover, .diff-card.selected {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102,217,255,0.15);
+    }
+    .diff-card.selected {
+      background: linear-gradient(180deg, rgba(102,217,255,0.15), var(--surface-2));
+    }
+    .diff-card strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      margin-bottom: 0.25rem;
+    }
+    .diff-card span {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--muted);
+    }
+    .controls-hint {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--space-3);
+      font-size: var(--text-xs);
+      color: var(--muted);
+      max-width: 34rem;
+    }
+    .ctrl-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.3rem 0.65rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+    }
+    /* GAME VIEW */
+    .game-view {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    .game-view.hidden { display: none; }
+    .hud-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: rgba(0,0,0,0.25);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .hud-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.35rem 0.5rem;
+      border-radius: var(--radius-md);
       background: var(--surface-2);
       border: 1px solid var(--border);
     }
-    .stat span {
-      display: block;
-      font-size: var(--text-xs);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--muted);
-      margin-bottom: var(--space-1);
-    }
-    .stat strong {
-      font-size: var(--text-lg);
-      font-variant-numeric: tabular-nums lining-nums;
-    }
-    .hero-card {
-      padding: var(--space-4);
-      border-radius: var(--radius-lg);
-      background: linear-gradient(180deg, rgba(102,217,255,0.12), rgba(12,18,34,0.3));
-      border: 1px solid var(--border);
-      display: grid;
-      gap: var(--space-3);
-    }
-    .hero-card h2 {
-      margin: 0;
-      font-size: var(--text-lg);
-    }
-    .hero-card p {
-      margin: 0;
-      font-size: var(--text-sm);
-      color: var(--muted);
-      max-width: 32ch;
-    }
-    .mini-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--space-4);
-      flex-wrap: wrap;
-    }
-    .tag {
-      border-radius: var(--radius-full);
-      padding: 0.45rem 0.8rem;
-      background: rgba(98,255,179,0.12);
-      border: 1px solid rgba(98,255,179,0.22);
-      font-size: var(--text-xs);
-      color: var(--accent);
+    .hud-item span {
+      font-size: 0.65rem;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-    }
-    .stage {
-      font-size: var(--text-sm);
       color: var(--muted);
+    }
+    .hud-item strong {
+      font-size: var(--text-base);
+      font-weight: 700;
+    }
+    .passives-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      background: rgba(10, 14, 26, 0.6);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      overflow-x: auto;
+    }
+    .passive-slot {
+      min-width: 2rem;
+      height: 2rem;
+      padding: 0 0.5rem;
+      border-radius: var(--radius-md);
+      border: 1px dashed rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .passive-slot.filled {
+      border: 1px solid var(--primary);
+      background: linear-gradient(135deg, rgba(102,217,255,0.2), rgba(166,130,255,0.15));
+      color: var(--text);
+      font-weight: 600;
     }
     .game-wrap {
       position: relative;
-      border-radius: calc(var(--radius-xl) - 0.2rem);
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(6, 10, 20, 0.98), rgba(2, 4, 10, 1));
       overflow: hidden;
-      background: linear-gradient(180deg, rgba(10, 15, 28, 0.96), rgba(3, 7, 14, 1));
-      border: 1px solid rgba(255,255,255,0.08);
     }
-    .choice-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      display: none;
-      place-items: center;
-      padding: var(--space-4);
-      background: rgba(5, 8, 18, 0.88);
-      backdrop-filter: blur(5px);
-    }
-    .choice-overlay.show { display: grid; }
-    .choice-panel {
-      width: min(100%, 25rem);
-      padding: var(--space-4);
-      border: 1px solid rgba(102,217,255,.3);
-      border-radius: var(--radius-lg);
-      background: var(--surface-2);
-      text-align: center;
-    }
-    .choice-panel h3 { margin: 0 0 var(--space-2); font-family: var(--font-display); }
-    .choice-panel p { margin: 0 0 var(--space-4); color: var(--muted); }
-    .upgrade-grid { display: grid; gap: var(--space-2); }
-    .upgrade-card { padding: var(--space-3); text-align: left; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
-    .upgrade-card strong, .upgrade-card span { display: block; }
-    .upgrade-card span { margin-top: .2rem; color: var(--muted); font-size: var(--text-xs); }
-    .combo-meter { height: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
-    .combo-fill { width: 0; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .08s linear; }
-    .run-summary { display: grid; grid-template-columns: 1fr 1fr; gap: .35rem .8rem; margin: var(--space-3) 0; font-size: var(--text-xs); text-align: left; }
-    .run-summary span:nth-child(even) { text-align: right; font-weight: 700; }
     canvas {
       width: 100%;
-      aspect-ratio: 10 / 15;
+      height: 100%;
       display: block;
       touch-action: none;
       background: transparent;
     }
+    .boss-banner {
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0.4rem 1.2rem;
+      border-radius: var(--radius-full);
+      background: rgba(255, 95, 125, 0.25);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      font-weight: 700;
+      font-size: var(--text-xs);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(255,95,125,0.4);
+    }
+    .boss-banner.show { display: block; }
     .hud-banner {
       position: absolute;
       inset: auto 0 0 0;
       display: flex;
       justify-content: space-between;
       gap: var(--space-2);
-      padding: var(--space-3);
+      padding: var(--space-2) var(--space-4);
       pointer-events: none;
       font-size: var(--text-xs);
       color: var(--muted);
-      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.42));
+      background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6));
     }
+    .combo-meter {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,.1);
+      overflow: hidden;
+    }
+    .combo-fill {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width .08s linear;
+    }
+    /* SHOP / BALATRO INTERMISSION OVERLAY */
+    .shop-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: none;
+      place-items: center;
+      padding: var(--space-4);
+      background: rgba(4, 7, 16, 0.92);
+      backdrop-filter: blur(10px);
+      overflow-y: auto;
+    }
+    .shop-overlay.show { display: grid; }
+    .shop-panel {
+      width: min(100%, 36rem);
+      padding: var(--space-5);
+      border: 1px solid rgba(102,217,255,.3);
+      border-radius: var(--radius-xl);
+      background: var(--surface-2);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+    .shop-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: var(--space-3);
+    }
+    .shop-header h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+    }
+    .shop-header p {
+      margin: 0;
+      font-size: var(--text-xs);
+      color: var(--muted);
+    }
+    .shop-cash {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      color: var(--gold);
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-3);
+    }
+    .shop-card {
+      padding: var(--space-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-2);
+      transition: border-color 0.2s ease;
+    }
+    .shop-card:hover { border-color: var(--primary); }
+    .shop-card strong { font-size: var(--text-sm); display: block; }
+    .shop-card p { margin: 0; font-size: var(--text-xs); color: var(--muted); flex: 1; }
+    .shop-card .cost { font-weight: 700; color: var(--gold); font-size: var(--text-sm); }
+    .shop-card button {
+      padding: 0.4rem 0.8rem;
+      border-radius: var(--radius-full);
+      background: linear-gradient(135deg, rgba(251,191,36,0.2), rgba(245,158,11,0.2));
+      border: 1px solid rgba(251,191,36,0.4);
+      color: var(--gold);
+      font-weight: 700;
+      font-size: var(--text-xs);
+    }
+    .shop-card button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    /* GAME OVER OVERLAY */
     .overlay {
       position: absolute;
       inset: 0;
+      z-index: 30;
       display: none;
       place-items: center;
-      background: rgba(5, 7, 15, 0.6);
+      background: rgba(4, 6, 14, 0.92);
+      backdrop-filter: blur(10px);
       padding: var(--space-4);
+      overflow-y: auto;
     }
     .overlay.show { display: grid; }
     .dialog {
-      width: min(100%, 22rem);
+      width: min(100%, 26rem);
       padding: var(--space-5);
       border-radius: var(--radius-xl);
-      background: rgba(12, 18, 34, 0.94);
-      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(12, 18, 34, 0.96);
+      border: 1px solid rgba(255,255,255,0.15);
       text-align: center;
       box-shadow: var(--shadow);
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: var(--space-3);
     }
     .dialog h3 {
@@ -289,21 +497,35 @@
       font-family: var(--font-display);
       font-size: var(--text-xl);
     }
-    .dialog p {
-      margin: 0;
-      font-size: var(--text-sm);
-      color: var(--muted);
-    }
-    .controls {
+    .run-summary {
       display: grid;
-      gap: var(--space-3);
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 0.8rem;
+      margin: var(--space-2) 0;
+      font-size: var(--text-xs);
+      text-align: left;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .run-summary span:nth-child(even) { text-align: right; font-weight: 700; }
+    .unlock-banner {
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
+      background: rgba(98,255,179,0.12);
+      border: 1px solid rgba(98,255,179,0.3);
+      color: var(--accent);
+      font-size: var(--text-xs);
+      text-align: center;
     }
     .button-row {
       display: flex;
       gap: var(--space-3);
+      width: 100%;
     }
     .btn {
-      min-height: 3rem;
+      min-height: 2.8rem;
       border-radius: var(--radius-full);
       padding: 0 var(--space-4);
       font-size: var(--text-sm);
@@ -312,14 +534,14 @@
       justify-content: center;
       align-items: center;
       gap: var(--space-2);
-      transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), background 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 180ms ease, background 180ms ease;
     }
     .btn:active { transform: scale(0.98); }
     .btn-primary {
       flex: 1;
-      background: linear-gradient(135deg, rgba(102,217,255,0.2), rgba(98,255,179,0.18));
+      background: linear-gradient(135deg, rgba(102,217,255,0.25), rgba(98,255,179,0.22));
       color: var(--text);
-      border: 1px solid rgba(102,217,255,0.25);
+      border: 1px solid rgba(102,217,255,0.35);
     }
     .btn-secondary {
       flex: 1;
@@ -327,53 +549,19 @@
       color: var(--text);
       border: 1px solid var(--border);
     }
-    .mobile-controls {
-      display: grid;
+    .bottom-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: rgba(0,0,0,0.2);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
     }
-    .slider-shell {
-      background: var(--surface-2);
-      border-radius: var(--radius-full);
-      padding: var(--space-2);
-      border: 1px solid var(--border);
-    }
-    .slider-track {
-      position: relative;
-      height: 3.35rem;
-      border-radius: var(--radius-full);
-      background: rgba(255,255,255,0.04);
-    }
-    .ship-knob {
-      position: absolute;
-      top: 50%;
-      width: 4rem;
-      height: 2.35rem;
-      margin-top: -1.175rem;
-      border-radius: var(--radius-full);
-      background: linear-gradient(135deg, rgba(102,217,255,0.25), rgba(166,130,255,0.26));
-      border: 1px solid rgba(255,255,255,0.14);
-      box-shadow: 0 12px 22px rgba(0,0,0,0.25);
-      display: grid;
-      place-items: center;
-      touch-action: none;
-    }
-    .fire-btn {
-      min-height: 3.4rem;
-      border-radius: var(--radius-full);
-      font-size: var(--text-base);
-      font-weight: 700;
-      background: linear-gradient(135deg, rgba(255,127,157,0.26), rgba(255,95,125,0.2));
-      color: var(--text);
-      border: 1px solid rgba(255,127,157,0.3);
-    }
-    .caption {
-      margin: 0;
-      text-align: center;
-      font-size: var(--text-xs);
-      color: var(--muted);
-    }
-    @media (max-width: 23rem) {
-      .stats { grid-template-columns: 1fr; }
+    @media (max-width: 480px) {
+      .hud-bar { grid-template-columns: repeat(3, 1fr); }
+      .shop-grid { grid-template-columns: 1fr; }
       .button-row { flex-direction: column; }
     }
   </style>
@@ -384,7 +572,7 @@
       <div class="topbar">
         <div class="brand">
           <div class="brand-mark" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M12 4L16 15H8L12 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
               <path d="M5 18H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
               <path d="M8 15L5 10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
@@ -392,79 +580,127 @@
             </svg>
           </div>
           <div>
-            <p>Vector dive shooter</p>
+            <p>Balatro Dive Shooter</p>
             <h1>Vector Galaxy</h1>
           </div>
         </div>
-        <button class="toggle" type="button" data-theme-toggle aria-label="Switch to light mode">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
-        </button>
+        <div class="topbar-actions">
+          <span class="badge badge-normal" id="diffBadge">Normal</span>
+          <span class="badge" id="gamepadBadge" style="display:none; color: var(--accent); border-color: rgba(98,255,179,0.3);">🎮 Gamepad</span>
+          <button class="toggle" type="button" data-theme-toggle aria-label="Switch theme">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+          </button>
+        </div>
       </div>
 
-      <div class="panel">
-        <div class="stats">
-          <div class="stat"><span>Score</span><strong id="score">0</strong></div>
-          <div class="stat"><span>Lives</span><strong id="lives">3</strong></div>
-          <div class="stat"><span>Wave</span><strong id="wave">1</strong></div>
-          <div class="stat"><span>Best</span><strong id="bestScore">0</strong></div>
-        </div>
+      <div class="main-view">
+        <!-- TITLE SCREEN VIEW -->
+        <div class="title-screen" id="titleScreen">
+          <div class="title-hero">
+            <h2>VECTOR GALAXY</h2>
+            <p>Conquer sectors, defeat boss blinds, and build passive modifier decks in a neon roguelike universe.</p>
+          </div>
 
-        <div class="hero-card">
-          <div class="mini-row">
-            <div>
-              <h2>Classic pressure, modern glow</h2>
-              <p>Slide your fighter, break the formation, and watch for dive attacks.</p>
-            </div>
-            <div>
-              <div class="tag" id="modeLabel">Ready</div>
-              <div class="stage" id="bonusLabel">Chain shots raise your bonus</div>
+          <div style="text-align: center;">
+            <p style="margin-bottom: 0.5rem; font-size: var(--text-xs); color: var(--muted); uppercase; letter-spacing: 0.1em;">SELECT DIFFICULTY</p>
+            <div class="difficulty-select">
+              <div class="diff-card" data-diff="easy">
+                <strong>EASY</strong>
+                <span>4 Lives · 0.75x Score<br>+$10 Starter Cash</span>
+              </div>
+              <div class="diff-card selected" data-diff="normal">
+                <strong>NORMAL</strong>
+                <span>3 Lives · 1.0x Score<br>Standard Sector Dive</span>
+              </div>
+              <div class="diff-card" data-diff="hard">
+                <strong>HARD</strong>
+                <span>2 Lives · 1.5x Score<br>Aggressive Boss Dive</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="game-wrap">
-          <canvas id="gameCanvas" width="480" height="720" aria-label="Arcade game play area"></canvas>
-          <div class="hud-banner">
-            <span>Drag the slider to move</span>
-            <span>Tap fire for rapid shots</span>
-          </div>
-          <div class="combo-meter" aria-label="Combo time remaining"><div class="combo-fill" id="comboFill"></div></div>
-          <div class="overlay" id="overlay">
-            <div class="dialog">
-              <p id="overlayTag">Run ended</p>
-              <h3 id="overlayTitle">Fleet lost</h3>
-              <p id="overlayText">Your score is ready for another attempt.</p>
-              <div class="run-summary" id="runSummary"></div>
-              <button class="btn btn-primary" id="overlayRestart" type="button">Launch again</button>
-            </div>
-          </div>
-          <div class="choice-overlay" id="choiceOverlay">
-            <div class="choice-panel">
-              <h3>Choose an upgrade</h3>
-              <p>Shape this run before the next sector.</p>
-              <div class="upgrade-grid" id="upgradeGrid"></div>
-            </div>
+          <button class="btn btn-primary" id="startRunBtn" style="min-width: 14rem; font-size: var(--text-base);" type="button">LAUNCH RUN</button>
+
+          <div class="controls-hint">
+            <span class="ctrl-pill">⌨️ WASD / Arrows</span>
+            <span class="ctrl-pill">🖱️ Mouse Move + Click</span>
+            <span class="ctrl-pill">📱 Touch Drag / Tap</span>
+            <span class="ctrl-pill">🎮 Controller Analog / A</span>
           </div>
         </div>
 
-        <div class="controls">
-          <div class="button-row">
-            <button class="btn btn-primary" id="restartButton" type="button">Restart</button>
-            <button class="btn btn-secondary" id="autofireButton" type="button">Autofire: On</button>
+        <!-- GAMEPLAY VIEW -->
+        <div class="game-view hidden" id="gameView">
+          <div class="hud-bar">
+            <div class="hud-item"><span>Score</span><strong id="score">0</strong></div>
+            <div class="hud-item"><span>Ante</span><strong id="anteInfo">1-1</strong></div>
+            <div class="hud-item"><span>Blind</span><strong id="blindName">Small</strong></div>
+            <div class="hud-item"><span>Lives</span><strong id="lives">3</strong></div>
+            <div class="hud-item"><span>Cash</span><strong id="cash" style="color:var(--gold);">$0</strong></div>
+            <div class="hud-item"><span>Best</span><strong id="bestScore">0</strong></div>
           </div>
-          <div class="mobile-controls">
-            <div class="slider-shell">
-              <div class="slider-track" id="sliderTrack" aria-label="Ship movement slider">
-                <div class="ship-knob" id="shipKnob" aria-hidden="true">
-                  <svg width="26" height="16" viewBox="0 0 26 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M13 2L17 11H9L13 2Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                    <path d="M7 12H19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                  </svg>
+
+          <div class="passives-bar" id="passivesBar" aria-label="Equipped passive modifiers">
+            <span style="font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em;">Passives (0/5):</span>
+            <div class="passive-slot">Empty</div>
+            <div class="passive-slot">Empty</div>
+            <div class="passive-slot">Empty</div>
+            <div class="passive-slot">Empty</div>
+            <div class="passive-slot">Empty</div>
+          </div>
+
+          <div class="game-wrap" id="gameWrap">
+            <div class="boss-banner" id="bossBanner">⚠️ BOSS BLIND: THE WALL</div>
+            <canvas id="gameCanvas" aria-label="Arcade game play area"></canvas>
+            <div class="hud-banner">
+              <span id="controlStatusHint">Move mouse or touch to steer · Tap to fire</span>
+              <span id="comboLabel">Chain shots for multiplier</span>
+            </div>
+            <div class="combo-meter"><div class="combo-fill" id="comboFill"></div></div>
+
+            <!-- SHOP / INTERMISSION OVERLAY -->
+            <div class="shop-overlay" id="shopOverlay">
+              <div class="shop-panel">
+                <div class="shop-header">
+                  <div>
+                    <h3>SECTOR SHOP</h3>
+                    <p id="shopSubtext">Ante cleared! Upgrade your ship before the next blind.</p>
+                  </div>
+                  <div class="shop-cash" id="shopCash">$0</div>
+                </div>
+
+                <div class="shop-grid" id="shopGrid">
+                  <!-- Dynamically populated shop items -->
+                </div>
+
+                <div class="button-row">
+                  <button class="btn btn-primary" id="nextBlindBtn" type="button">NEXT BLIND ➔</button>
                 </div>
               </div>
             </div>
-            <button class="fire-btn" id="fireButton" type="button">Fire pulse</button>
-            <p class="caption">Desktop controls: left and right arrows, A and D, plus space to fire.</p>
+
+            <!-- GAME OVER OVERLAY -->
+            <div class="overlay" id="overlay">
+              <div class="dialog">
+                <p id="overlayTag" style="color:var(--danger); text-transform:uppercase; font-size:var(--text-xs); font-weight:700;">RUN TERMINATED</p>
+                <h3 id="overlayTitle">Fleet lost</h3>
+                <p id="overlayText">Sector progression ended.</p>
+                <div class="run-summary" id="runSummary"></div>
+                <div class="unlock-banner" id="unlockBanner" style="display:none;"></div>
+                <div class="button-row">
+                  <button class="btn btn-primary" id="overlayRestart" type="button">PLAY AGAIN</button>
+                  <button class="btn btn-secondary" id="overlayMenu" type="button">MAIN MENU</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-controls">
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary" id="pauseButton" type="button" style="min-height:2.2rem; padding:0 1rem; font-size:var(--text-xs);">Pause</button>
+              <button class="btn btn-secondary" id="autofireButton" type="button" style="min-height:2.2rem; padding:0 1rem; font-size:var(--text-xs);">Autofire: On</button>
+            </div>
+            <button class="btn btn-secondary" id="menuButton" type="button" style="min-height:2.2rem; padding:0 1rem; font-size:var(--text-xs);">Main Menu</button>
           </div>
         </div>
       </div>
@@ -474,3 +710,4 @@
   <script src="./game.js"></script>
 </body>
 </html>
+
