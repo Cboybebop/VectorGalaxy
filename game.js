@@ -31,9 +31,8 @@ const unlockBanner = $('unlockBanner');
 // Logical Virtual Resolution
 const VIRTUAL_WIDTH = 800;
 const VIRTUAL_HEIGHT = 1000;
-let scaleFactor = 1;
-let offsetX = 0;
-let offsetY = 0;
+let scaleFactorX = 1;
+let scaleFactorY = 1;
 
 // RESPONSIVE RESOLUTION HANDLING
 function resizeCanvas() {
@@ -46,30 +45,30 @@ function resizeCanvas() {
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
 
-  // Scale virtual coordinates (800x1000) to fit within container
-  scaleFactor = Math.min(rect.width / VIRTUAL_WIDTH, rect.height / VIRTUAL_HEIGHT);
-  offsetX = (rect.width - VIRTUAL_WIDTH * scaleFactor) / 2;
-  offsetY = (rect.height - VIRTUAL_HEIGHT * scaleFactor) / 2;
+  // Scale virtual coordinates (800x1000) to fill container full width & height
+  scaleFactorX = rect.width / VIRTUAL_WIDTH;
+  scaleFactorY = rect.height / VIRTUAL_HEIGHT;
 
   ctx.imageSmoothingEnabled = true;
 }
 
 window.addEventListener('resize', resizeCanvas);
 setTimeout(resizeCanvas, 50);
+
 const ENEMY_TYPES = {
-  scout: { color: '#62ffb3', hp: 1, value: 70, fireRate: 0.008, speed: 1.35 },
-  gunner: { color: '#66d9ff', hp: 1, value: 100, fireRate: 0.022, speed: 0.9 },
-  tank: { color: '#a682ff', hp: 3, value: 220, fireRate: 0.007, speed: 0.7 },
-  support: { color: '#ffcf66', hp: 2, value: 180, fireRate: 0.005, speed: 0.8 }
+  scout: { color: '#62ffb3', hp: 1, value: 70, fireRate: 0.0012, speed: 1.2 },
+  gunner: { color: '#66d9ff', hp: 1, value: 100, fireRate: 0.0035, speed: 0.9 },
+  tank: { color: '#a682ff', hp: 3, value: 220, fireRate: 0.0015, speed: 0.7 },
+  support: { color: '#ffcf66', hp: 2, value: 180, fireRate: 0.0008, speed: 0.8 }
 };
 
 const FORMATIONS = ['grid', 'vee', 'columns', 'diamond'];
 
 // DIFFICULTY CONFIGURATIONS
 const DIFFICULTIES = {
-  easy: { name: 'Easy', lives: 4, scoreMult: 0.75, diveSpeedMult: 0.8, startCash: 10, badgeClass: 'badge-easy' },
-  normal: { name: 'Normal', lives: 3, scoreMult: 1.0, diveSpeedMult: 1.0, startCash: 0, badgeClass: 'badge-normal' },
-  hard: { name: 'Hard', lives: 2, scoreMult: 1.5, diveSpeedMult: 1.35, startCash: 0, badgeClass: 'badge-hard' }
+  easy: { name: 'Easy', lives: 4, scoreMult: 0.75, diveSpeedMult: 0.7, enemyFireMult: 0.35, diveDelay: 3.5, startCash: 10, badgeClass: 'badge-easy' },
+  normal: { name: 'Normal', lives: 3, scoreMult: 1.0, diveSpeedMult: 0.9, enemyFireMult: 0.65, diveDelay: 2.5, startCash: 0, badgeClass: 'badge-normal' },
+  hard: { name: 'Hard', lives: 2, scoreMult: 1.5, diveSpeedMult: 1.2, enemyFireMult: 1.0, diveDelay: 1.8, startCash: 0, badgeClass: 'badge-hard' }
 };
 
 // BALATRO BOSS MODIFIERS
@@ -297,7 +296,8 @@ function createFormation() {
   enemies = [];
   formationOffset = 0;
   formationDirection = 1;
-  diveClock = 1.5;
+  const diffCfg = DIFFICULTIES[currentDifficulty];
+  diveClock = diffCfg.diveDelay;
   const pattern = FORMATIONS[(ante + round) % FORMATIONS.length];
   const count = 24;
 
@@ -323,7 +323,8 @@ function createFormation() {
       vx: 0,
       vy: 0,
       angle: 0,
-      value: data.value
+      value: data.value,
+      cooldown: 1.0 + Math.random() * 2.5
     });
   }
 }
@@ -339,7 +340,7 @@ function syncHud() {
 }
 
 function renderPassivesBar() {
-  passivesBar.innerHTML = `<span style="font-size:0.65rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em;">Passives (${equippedPassives.length}/5):</span>`;
+  passivesBar.innerHTML = `<span style="font-size:0.6rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; flex-shrink:0;">Passives (${equippedPassives.length}/5):</span>`;
   for (let i = 0; i < 5; i++) {
     const slot = document.createElement('div');
     if (i < equippedPassives.length) {
@@ -387,9 +388,9 @@ function fireBullet() {
 
 function enemyFire(enemy, spread = false) {
   const dx = player.x - enemy.x, dy = player.y - enemy.y, length = Math.hypot(dx, dy) || 1;
-  const angles = spread ? [-0.2, 0, 0.2] : [0];
+  const angles = spread ? [-0.15, 0.15] : [0];
   angles.forEach(a => {
-    const vx = (dx / length) * 320, vy = Math.abs((dy / length) * 320);
+    const vx = (dx / length) * 260, vy = Math.abs((dy / length) * 260);
     enemyBullets.push({ x: enemy.x, y: enemy.y + 16, vx: vx + vy * a, vy });
   });
 }
@@ -445,9 +446,13 @@ function updateFormation(dt) {
   formationOffset += formationDirection * dt * (35 + ante * 4);
   if (Math.abs(formationOffset) > 60) formationDirection *= -1;
 
+  const maxEnemyBullets = 4 + ante * 2;
+
   for (const e of enemies) {
     if (!e.alive) continue;
+    e.cooldown = Math.max(0, (e.cooldown || 0) - dt);
     const data = ENEMY_TYPES[e.type];
+
     if (!e.diving) {
       e.x = e.baseX + formationOffset;
       e.y = e.baseY + Math.sin(e.col + performance.now() * 0.0015) * 5;
@@ -459,13 +464,20 @@ function updateFormation(dt) {
         Object.assign(e, { diving: false, x: e.baseX + formationOffset, y: e.baseY, vx: 0, vy: 0, angle: 0 });
       }
     }
-    if (Math.random() < data.fireRate * dt * 60 * (1 + ante * 0.05)) enemyFire(e, e.type === 'gunner');
+
+    if (e.cooldown <= 0 && enemyBullets.length < maxEnemyBullets) {
+      const chance = data.fireRate * dt * 60 * diffCfg.enemyFireMult * (1 + ante * 0.08);
+      if (Math.random() < chance) {
+        enemyFire(e, e.type === 'gunner' && (currentDifficulty === 'hard' || ante >= 2));
+        e.cooldown = 3.0 + Math.random() * 2.5;
+      }
+    }
   }
 
   diveClock -= dt * diveMult;
   if (diveClock <= 0) {
     sendDiver();
-    diveClock = Math.max(0.4, 1.8 - ante * 0.08);
+    diveClock = Math.max(0.6, diffCfg.diveDelay - ante * 0.1);
   }
 }
 
@@ -518,11 +530,6 @@ function burst(x, y, color, radius = 10) {
 
 function registerKill(e) {
   e.alive = false;
-  combo += 1;
-  comboTime = 2.2;
-  runStats.kills += 1;
-  runStats.maxCombo = Math.max(runStats.maxCombo, combo);
-
   const diffCfg = DIFFICULTIES[currentDifficulty];
   const baseVal = e.value * diffCfg.scoreMult;
   const comboBonus = 1 + Math.min(combo, 25) * 0.1 * playerStats.comboBoost;
