@@ -32,8 +32,30 @@ const unlockBanner = $('unlockBanner');
 const VIRTUAL_WIDTH = 800;
 const VIRTUAL_HEIGHT = 1000;
 let scaleFactor = 1;
+let offsetX = 0;
+let offsetY = 0;
 
-// ENEMY DEFINITIONS
+// RESPONSIVE RESOLUTION HANDLING
+function resizeCanvas() {
+  const container = $('gameWrap');
+  if (!container) return;
+  const rect = container.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  // Scale virtual coordinates (800x1000) to fit within container
+  scaleFactor = Math.min(rect.width / VIRTUAL_WIDTH, rect.height / VIRTUAL_HEIGHT);
+  offsetX = (rect.width - VIRTUAL_WIDTH * scaleFactor) / 2;
+  offsetY = (rect.height - VIRTUAL_HEIGHT * scaleFactor) / 2;
+
+  ctx.imageSmoothingEnabled = true;
+}
+
+window.addEventListener('resize', resizeCanvas);
+setTimeout(resizeCanvas, 50);
 const ENEMY_TYPES = {
   scout: { color: '#62ffb3', hp: 1, value: 70, fireRate: 0.008, speed: 1.35 },
   gunner: { color: '#66d9ff', hp: 1, value: 100, fireRate: 0.022, speed: 0.9 },
@@ -118,22 +140,7 @@ let runStats = {
   blindsCleared: 0
 };
 
-// RESPONSIVE RESOLUTION HANDLING
-function resizeCanvas() {
-  const container = $('gameWrap');
-  if (!container) return;
-  const rect = container.getBoundingClientRect();
-  if (rect.width === 0 || rect.height === 0) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  scaleFactor = rect.width / VIRTUAL_WIDTH;
-  ctx.imageSmoothingEnabled = true;
-}
 
-window.addEventListener('resize', resizeCanvas);
-setTimeout(resizeCanvas, 50);
 
 // UNLOCK MANAGEMENT
 function checkUnlocks() {
@@ -764,7 +771,7 @@ function updateStars(dt) {
 // CANVAS DRAWING ROUTINES (WITH VIRTUAL TO CANVAS RESOLUTION SCALING)
 function drawShip(x, y, color) {
   ctx.save();
-  ctx.translate(x * scaleFactor, y * scaleFactor);
+  ctx.translate(offsetX + x * scaleFactor, offsetY + y * scaleFactor);
   ctx.strokeStyle = color;
   ctx.lineWidth = 2.8 * scaleFactor;
   ctx.shadowBlur = 16 * scaleFactor;
@@ -785,7 +792,7 @@ function drawShip(x, y, color) {
 function drawEnemy(e) {
   const d = ENEMY_TYPES[e.type];
   ctx.save();
-  ctx.translate(e.x * scaleFactor, e.y * scaleFactor);
+  ctx.translate(offsetX + e.x * scaleFactor, offsetY + e.y * scaleFactor);
   if (e.diving) ctx.rotate(Math.sin(e.angle) * 0.35);
 
   ctx.strokeStyle = d.color;
@@ -812,7 +819,7 @@ function drawEnemy(e) {
 
 function drawBoss() {
   ctx.save();
-  ctx.translate(boss.x * scaleFactor, boss.y * scaleFactor);
+  ctx.translate(offsetX + boss.x * scaleFactor, offsetY + boss.y * scaleFactor);
   ctx.strokeStyle = '#ffcf66';
   ctx.shadowColor = '#ffcf66';
   ctx.shadowBlur = 24 * scaleFactor;
@@ -836,19 +843,31 @@ function drawBoss() {
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Draw Starfield
+  // Draw Starfield (covers full canvas for dark space background)
   if (stars) stars.forEach(s => {
     ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-    ctx.fillRect(s.x * scaleFactor, s.y * scaleFactor, s.size * scaleFactor, s.size * scaleFactor);
+    ctx.fillRect(s.x * scaleFactor + offsetX * 0.2, s.y * scaleFactor + offsetY * 0.2, s.size * scaleFactor, s.size * scaleFactor);
   });
 
-  // Background Grid Lines
+  // Background Grid Lines inside virtual play area
   ctx.strokeStyle = 'rgba(102,217,255,.06)';
   ctx.lineWidth = 1 * scaleFactor;
   for (let y = 60; y < VIRTUAL_HEIGHT; y += 80) {
     ctx.beginPath();
-    ctx.moveTo(0, y * scaleFactor);
-    ctx.lineTo(canvas.width, y * scaleFactor);
+    ctx.moveTo(offsetX, offsetY + y * scaleFactor);
+    ctx.lineTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY + y * scaleFactor);
+    ctx.stroke();
+  }
+
+  // Draw subtle play boundary side rails if aspect ratio leaves side margins
+  if (offsetX > 4) {
+    ctx.strokeStyle = 'rgba(102,217,255,.15)';
+    ctx.lineWidth = 1.5 * scaleFactor;
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    ctx.lineTo(offsetX, offsetY + VIRTUAL_HEIGHT * scaleFactor);
+    ctx.moveTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY);
+    ctx.lineTo(offsetX + VIRTUAL_WIDTH * scaleFactor, offsetY + VIRTUAL_HEIGHT * scaleFactor);
     ctx.stroke();
   }
 
@@ -857,8 +876,8 @@ function render() {
     ctx.strokeStyle = '#66d9ff';
     ctx.lineWidth = 2.5 * scaleFactor;
     ctx.beginPath();
-    ctx.moveTo(b.x * scaleFactor, (b.y + 12) * scaleFactor);
-    ctx.lineTo(b.x * scaleFactor, (b.y - 12) * scaleFactor);
+    ctx.moveTo(offsetX + b.x * scaleFactor, offsetY + (b.y + 12) * scaleFactor);
+    ctx.lineTo(offsetX + b.x * scaleFactor, offsetY + (b.y - 12) * scaleFactor);
     ctx.stroke();
   });
 
@@ -867,8 +886,8 @@ function render() {
     ctx.strokeStyle = '#ff7f9d';
     ctx.lineWidth = 2.5 * scaleFactor;
     ctx.beginPath();
-    ctx.moveTo(b.x * scaleFactor, (b.y - 10) * scaleFactor);
-    ctx.lineTo(b.x * scaleFactor, (b.y + 10) * scaleFactor);
+    ctx.moveTo(offsetX + b.x * scaleFactor, offsetY + (b.y - 10) * scaleFactor);
+    ctx.lineTo(offsetX + b.x * scaleFactor, offsetY + (b.y + 10) * scaleFactor);
     ctx.stroke();
   });
 
@@ -884,7 +903,7 @@ function render() {
     ctx.globalAlpha = Math.max(0, p.life * 2);
     ctx.fillStyle = p.color;
     ctx.beginPath();
-    ctx.arc(p.x * scaleFactor, p.y * scaleFactor, p.radius * scaleFactor, 0, Math.PI * 2);
+    ctx.arc(offsetX + p.x * scaleFactor, offsetY + p.y * scaleFactor, p.radius * scaleFactor, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 1;
   });
@@ -921,8 +940,8 @@ function frame(time) {
 // EVENT LISTENERS & INPUT HANDLERS
 function handleCanvasPointer(e) {
   const rect = canvas.getBoundingClientRect();
-  const relX = (e.clientX - rect.left) / rect.width;
-  player.x = relX * VIRTUAL_WIDTH;
+  const relX = (e.clientX - rect.left - offsetX) / (VIRTUAL_WIDTH * scaleFactor);
+  player.x = Math.max(30, Math.min(VIRTUAL_WIDTH - 30, relX * VIRTUAL_WIDTH));
 }
 
 canvas.addEventListener('pointerdown', e => {
@@ -983,20 +1002,24 @@ $('autofireButton').onclick = () => {
 
 // THEME TOGGLE
 (function themeToggle() {
-  const btn = document.querySelector('[data-theme-toggle]'), root = document.documentElement;
+  const btns = document.querySelectorAll('[data-theme-toggle]'), root = document.documentElement;
   let mode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   function applyTheme() {
     root.dataset.theme = mode;
-    btn.setAttribute('aria-label', `Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`);
-    btn.innerHTML = mode === 'dark'
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    btns.forEach(btn => {
+      btn.setAttribute('aria-label', `Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`);
+      btn.innerHTML = mode === 'dark'
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    });
   }
   applyTheme();
-  btn.onclick = () => {
-    mode = mode === 'dark' ? 'light' : 'dark';
-    applyTheme();
-  };
+  btns.forEach(btn => {
+    btn.onclick = () => {
+      mode = mode === 'dark' ? 'light' : 'dark';
+      applyTheme();
+    };
+  });
 })();
 
 // INIT
